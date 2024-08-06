@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
 # ceaser.py version 0.1.0- A simple Ceaser Cipher solver, encoder, and decoder
-# written to provide basic functionality for solving Ceaser Ciphers 
-# since it seems like it just kept coming up (also it provided a nice 
+# written to provide basic functionality for solving Ceaser Ciphers
+# since it seems like it just kept coming up (also it provided a nice
 # chance to get to know the argparse module a bit better).
 # Written by: Jordan Furutani
 # Tested using Python 3.11.3
 
-import argparse 
-import sys 
+import argparse
+import sys
 
 def builtin_word_list():
     # a list of the 1000 most common words in the English language
@@ -36,7 +36,7 @@ def ceaser_brute_force(text):
     solutions = {}
     for shift in range(26):
         solutions[shift] = ceaser_unshift(text, shift)
-    return solutions 
+    return solutions
 
 
 def _grade_solution(text, word_list):
@@ -75,7 +75,7 @@ def ceaser_solver(text: str ,word_list: set[str], hint="") -> str | None:
     if best == 0:
         return None
     return solutions[best]
-     
+
 
 def output_solution(text, file):
     if not file:
@@ -102,7 +102,7 @@ def main():
     operation_exclusive_group.add_argument('-d', '--decode', type=int, help='decode the text, requires a shift value')
     operation_exclusive_group.add_argument('-s', '--solve', action='store_true', help='attempt to solve the cipher')
     operation_exclusive_group.add_argument('-b', '--brute_force', action='store_true', help='brute force the solution')
-    
+
     solution_assists_group = parser.add_argument_group('Solution Assists', description='Options to assist in solving the cipher, only used with -s')
     solution_assists_group.add_argument('-w','--word_list', type=argparse.FileType('r'), help='the word list to use when solving the cipher')
     solution_assists_group.add_argument('-H','--hint', type=str, help='a string which is known to appear in the plain text')
@@ -112,7 +112,7 @@ def main():
 
     # basic options
     parser.add_argument('-v','--verbose', action='store_true', help='verbose output')
-    parser.add_argument('-q','--quiet', action='store_true', help='quiet output') 
+    parser.add_argument('-q','--quiet', action='store_true', help='quiet output')
     parser.add_argument('-V', '--version', action='version', version='%(prog)s 0.1.0')
 
     args = parser.parse_args()
@@ -132,12 +132,12 @@ def main():
             print(f'Encoding {args.cipher_text} with shift {args.encode}')
         output_solution(ceaser_shift(args.cipher_text, args.encode), args.output_file)
         #print(ceaser_shift(args.cipher_text, args.encode))
-        return 
+        return 0
     elif args.decode:
         if args.verbose:
             print(f'Decoding {args.cipher_text} with shift {args.decode}')
         output_solution(ceaser_unshift(args.cipher_text, args.decode), args.output_file)
-        return 
+        return 0
     elif args.brute_force:
         if args.verbose:
             print(f'Brute forcing {args.cipher_text}')
@@ -155,10 +155,11 @@ def main():
                     print(f'Shift: {shift}  Solution: {solution}')
                 else:
                     print(f'Shift: {shift} Solution: {solution}')
-        return 
-    else:
-        word_list: set[str] = set([word.strip() for word in args.word_list.readlines()]) if args.word_list else None
-        if not word_list:
+        return 0
+    elif args.solve:
+        if args.word_list:
+            word_list: set[str] = set([word.strip() for word in args.word_list.readlines()])
+        else:
             if args.verbose:
                 print('No word list provided (-w), a short builtin word-list will be used, try using the -b option for all possible solutions')
             word_list = builtin_word_list()
@@ -170,6 +171,9 @@ def main():
             output_solution(solution, args.output_file)
         else:
             print('No solution found')
+    else:
+        print("No operation specified") # This should be caught by the argparse module
+        return 1
 
 if __name__ == '__main__':
     main()
