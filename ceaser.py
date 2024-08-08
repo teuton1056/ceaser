@@ -87,7 +87,6 @@ def output_solution(text: str, file: TextIOWrapper) -> None:
 
 
 def main() -> int:
-    builtin_word_list()
     parser = argparse.ArgumentParser(description='Ceaser Cipher Solver', exit_on_error=False)
     input_group = parser.add_argument_group('Input Options', description='The input text to decode, if not provided, will read from stdin')
     input_options_group = input_group.add_mutually_exclusive_group(required=False)
